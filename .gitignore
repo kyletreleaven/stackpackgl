@@ -3,3 +3,6 @@
 *.dll
 *.dll.mdb
 
+# backups
+*~
+*.bak
