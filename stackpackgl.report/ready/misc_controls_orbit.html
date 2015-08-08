@@ -37,14 +37,64 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - orbit controls example
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="js/three.min.js"></script>
 
-		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/OrbitControls.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="js/stats.min.js"></script>
 
 		<script>
+			var myRand = function myRand(lo,hi) {
+				return lo + (hi-lo) * Math.random();
+			};
+
+			var range = function(n) {
+				// why can't this just be Array(n).map(...) ?
+				return Array.apply(null, Array(n)).map( function (_,i) { return i; } );
+			};
+
+			var Box3 = function(xmin,xmax,ymin,ymax,zmin,zmax) {
+				this.xmin = xmin;
+				this.xmax = xmax;
+				this.ymin = ymin;
+				this.ymax = ymax;
+				this.zmin = zmin;
+				this.zmax = zmax;
+			};
+
+			Box3.prototype = {
+				X: function() { return this.xmax - this.xmin; },
+				Y: function() { return this.ymax - this.ymin; },
+				Z: function() { return this.zmax - this.zmin; }
+			};
+
+
+			var randPos = function() {
+				return { x: myRand(-500,500), y: myRand(-500,500), z: myRand(-500,500) };
+			};
+
+			var randDims = function() {
+				return { x: myRand(5,20), y: myRand(5,20), z: myRand(5,20) };
+			};
+			
+			var theBoxes = range(500).map(
+				function(k) {
+					var pos = randPos();
+					var dims = randDims();
+
+					return new Box3(
+						pos.x, pos.x + dims.x,
+						pos.y, pos.y + dims.y,
+						pos.z, pos.z + dims.z );
+				}
+			);
+/*
+			var theBoxes = 
+			[
+				{ xmin: 0, xmax: 10, ymin: 0, zmin: 0
+			];
+*/
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -76,15 +126,41 @@
 
 				// world
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-				var material =  new THREE.MeshLambertMaterial( { color:0xffffff, shading: THREE.FlatShading } );
+				var radiusTop = 5, radiusBottom = 10;
+				var circumSegments = 10;
+				var height = 30, heightSegments = 2;
 
-				for ( var i = 0; i < 500; i ++ ) {
+				//var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+				//var geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, circumSegments, height, heightSegments );
+				var geometry = new THREE.BoxGeometry(1,1,1);
+
+				var material =  new THREE.MeshLambertMaterial( { color:0xffffff, shading: THREE.FlatShading } );
+ 
+				//for ( var i = 0; i < 500; i ++ ) {
+				for (var i=0; i<theBoxes.length; i++) {
 
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
+
+					var box = theBoxes[i];
+
+					mesh.scale.x = box.X();
+					mesh.scale.y = box.Y();
+					mesh.scale.z = box.Z();
+
+					mesh.position.x = box.xmin;
+					mesh.position.y = box.ymin;
+					mesh.position.z = box.zmin;
+/*
+					mesh.scale.x = myRand(5,20);
+					mesh.scale.y = myRand(5,20);
+					mesh.scale.z = myRand(5,20);
+					//mesh.scale.x = (Math.random() - 0.5) *
+
+					mesh.position.x = myRand(-500,500);
+					mesh.position.y = myRand(-500,500);
+					mesh.position.z = myRand(-500,500);
+*/
+
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
 					scene.add( mesh );
