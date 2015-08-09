@@ -45,7 +45,7 @@
 		<script src="js/stats.min.js"></script>
 
 		<script id="boxdata" type="text/xmldata">
-			<box xmin=0 ymin=0 zmin=0 xmax=50 ymax=50 zmax=50/>
+			[]
 		</script>
 
 		<script>
@@ -74,6 +74,10 @@
 				Z: function() { return this.zmax - this.zmin; }
 			};
 
+			// data scoped out here so we can debug it
+			var boxHtml;
+			var myBoxData;
+								
 			window.onload = function() {
 				//alert("Hello World!");
 
@@ -88,29 +92,31 @@
 				var theBoxes;
 				
 				if (false) {
-					theBoxes = range(500).map(
+					var someBoxes = range(500).map(
 						function(k) {
 							var pos = randPos();
 							var dims = randDims();
-
+							
 							return new Box3(
 								pos.x, pos.x + dims.x,
 								pos.y, pos.y + dims.y,
 								pos.z, pos.z + dims.z );
-						}
-					);
+						});
+						
+					var boxArr = someBoxes.map( function(box) { return [box.xmin,box.xmax,box.ymin,box.ymax,box.zmin,box.zmax]; } );
+					
+					var item = document.getElementById("boxdata");
+					item.innerHTML = JSON.stringify(boxArr);
+				}
+				
+				boxHtml = document.getElementById("boxdata").innerHTML;
+				myBoxData = JSON.parse(boxHtml);
+				
+				arrToBox = function(arr) { return new Box3(arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]); };
+				
+				theBoxes = myBoxData.map( arrToBox );
 
-				} else {
-					var boxElements = document.getElementById("boxdata").children();
-
-					for (var i=0; i<boxElements.length ; i++) {
-						alert( boxElements[i].getAttribute("xmin") );
-					}
-
-					//theBoxes = [];						
-					theBoxes = [ new Box3(0,10,0,20,0,10) ];
-				}	
-
+				
 				if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 				var container, stats;
