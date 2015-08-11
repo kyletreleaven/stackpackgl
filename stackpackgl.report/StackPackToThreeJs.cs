@@ -39,7 +39,7 @@ namespace stackpackgl.report
 
 			HtmlWeb htmlWeb = new HtmlWeb();
 
-			HtmlDocument htmlDocument = htmlWeb.Load ("C:\\Users\\ktreleaven\\sandbox\\_prototypes\\stackpackgl\\stackpackgl.report\\template.html");
+			HtmlDocument htmlDocument = htmlWeb.Load ("C:\\Users\\ktreleaven\\sandbox\\_prototypes\\stackpackgl\\stackpackgl.report\\template-standalone.html");
 		
 			var dataNode = htmlDocument.GetElementbyId ("boxdata");
 
