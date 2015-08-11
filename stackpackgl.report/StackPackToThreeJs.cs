@@ -4,6 +4,8 @@ using HtmlAgilityPack;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.IO;
+using System.Reflection;
 
 namespace stackpackgl.report
 {
@@ -32,16 +34,19 @@ namespace stackpackgl.report
 	{
 		public static string ToThreeJs(this IEnumerable<IBox3> boxes)
 		{
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            Stream stream = assembly.GetManifestResourceStream("stackpackgl.report.template-standalone.html");
+            StreamReader reader = new StreamReader(stream);
+
 			string jsonString;
 
 			var boxData = boxes.Select (box => new float [] { box.Xmin, box.Xmax, box.Ymin, box.Ymax, box.Zmin, box.Zmax });
 			jsonString = JsonConvert.SerializeObject(boxData);
 
-			HtmlWeb htmlWeb = new HtmlWeb();
+            HtmlDocument htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(reader.ReadToEnd());
 
-			HtmlDocument htmlDocument = htmlWeb.Load ("C:\\Users\\ktreleaven\\sandbox\\_prototypes\\stackpackgl\\stackpackgl.report\\template-standalone.html");
-		
-			var dataNode = htmlDocument.GetElementbyId ("boxdata");
+            var dataNode = htmlDocument.GetElementbyId ("boxdata");
 
 			dataNode.InnerHtml = jsonString;
 
